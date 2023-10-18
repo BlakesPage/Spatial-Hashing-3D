@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 namespace BlakesHashGrid
@@ -7,59 +8,120 @@ namespace BlakesHashGrid
     public interface ISpatialHash3D
     {
         Vector3 GetPosition();
+        uint Index { get; set; }
+        int Id { get; set; } 
     }
 
     public class HashGrid3D<T> where T : ISpatialHash3D
     {
-        public float GridDimensions;
+        public Vector3 GridDimensions;
         public Vector3 CellSize;
 
-        public int columnsX;
-        public int rowsY;
+        public int rowsX;
+        public int columnsY;
         public int tubeZ;
 
-        public Dictionary<int, List<T>> cells;
+        //3D Coordinates of the down left corner of 
+        //public float minX, minY, minZ;
+
+        public Dictionary<uint, List<T>> cells;
         public int CellCount;
 
-        public HashGrid3D(int cols, int rows, int tubes, float dimensions)
+        public HashGrid3D(int cols, int rows, int tubes, float dimensionsX, float dimensionsY, float dimensionsZ)
         {
-            GridDimensions = dimensions;
-            columnsX = cols;
-            rowsY = rows;
+            GridDimensions.x = dimensionsX;
+            GridDimensions.y = dimensionsY;
+            GridDimensions.z = dimensionsZ;
+            rowsX = rows;
+            columnsY = cols;
             tubeZ = tubes;
 
-            CellSize.x = GridDimensions / columnsX;
-            CellSize.y = GridDimensions / rowsY;
-            CellSize.z = GridDimensions / tubeZ;
+            CellSize.x = GridDimensions.x / rowsX;
+            CellSize.y = GridDimensions.y / columnsY;
+            CellSize.z = GridDimensions.z / tubeZ;
 
-            this.cells = new Dictionary<int, List<T>>(columnsX * rowsY * tubeZ);
+            cells = new Dictionary<uint, List<T>>(rowsX * columnsY * tubeZ);
 
-            for (int i = 0; i < cols * rows * tubes; i++)
+            for (uint i = 0; i < rowsX * columnsY * tubeZ; i++)
             {
-                this.cells.Add(i, new List<T>());
+                cells.Add(i, new List<T>());
             }
 
-            this.CellCount = cells.Count;
+            CellCount = cells.Count;
         }
 
-        // add object to cell
+        // Initalise obj into Spatial Hash Grid
         public void Insert(T obj)
         {
+            uint index = obj.Index = GetIndexFromHash(HashCell(PositionToCellCoord(obj.GetPosition(), CellSize)));
 
+            cells[index].Add(obj);
         }
 
         // get nearby objects in cell
         public List<T> GetNearby(T obj)
         {
-            return null;
+            List<T> tempList = new List<T>();
+
+            // Cache object values for performance
+            uint index = obj.Index;
+            int id = obj.Id;
+
+            foreach (T t in cells[index]) 
+            {
+                if(t.Id != id)
+                {
+                    tempList.Add(t);
+                }
+            }
+
+            // add extra detection for surrounding cells
+
+            return tempList;
         }
 
-        private int[] GetCellIDs(T obj)
+        public void UpdateIndex(T obj)
         {
+            uint index = obj.Index;
+                
+            uint newIndex = GetIndex(obj.GetPosition());
 
+            if(index != newIndex)
+            { 
+                obj.Index = newIndex;
+                cells[index].Remove(obj);
+                Debug.Log(obj.Index);
+                return;
+            }
+        }
 
+        public void test(T obj)
+        {
+            obj.Index = GetIndexFromHash(HashCell(PositionToCellCoord(obj.GetPosition(), CellSize)));
+        }
 
-            return null;
+        public Vector3Int PositionToCellCoord(Vector3 point, Vector3 cellSize)
+        {
+            int cellX = FastFloor(point.x / cellSize.x);
+            int cellY = FastFloor(point.y / cellSize.y);
+            int cellZ = FastFloor(point.z / cellSize.z);
+            return new Vector3Int(cellX, cellY, cellZ);
+        }
+
+        public uint HashCell(Vector3Int cellCoord)
+        {
+            var hash = Hash128.Compute(ref cellCoord);
+            return (uint)hash.GetHashCode();
+        }
+
+        public uint GetIndexFromHash(uint num)
+        {
+            return (uint)(num % CellCount);
+        }
+
+        public uint GetIndex(Vector3 point)
+        {
+            return GetIndexFromHash(HashCell(PositionToCellCoord(point, CellSize)));
         }
 
         // Better implementation of Floor, which boosts the floor performance greatly
