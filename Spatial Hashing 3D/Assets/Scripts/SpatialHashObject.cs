@@ -1,11 +1,18 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using BlakesHashGrid;
 
-public class SpatialHashObject : MonoBehaviour, ISpatialHash3D
+namespace BlakesHashGrid
 {
-    public uint Index { get; set; }
-    public int Id { get; set; }
-    public Vector3 GetPosition() { return transform.position; }
+    public interface ISpatialHash3D
+    {
+        Vector3 GetPosition();
+        uint Index { get; set; }
+        bool Enabled { get; set; }
+    }
+
+    public class SpatialHashObject : MonoBehaviour, ISpatialHash3D
+    {
+        public Vector3 GetPosition() { return transform.position; }
+        public uint Index { get; set; }
+        public bool Enabled { get; set; }
+    }
 }

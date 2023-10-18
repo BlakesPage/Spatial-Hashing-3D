@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using BlakesHashGrid;
@@ -17,10 +16,9 @@ public class GridMaker : MonoBehaviour
     private List<Vector3> gridPoints = new List<Vector3>();
     public int TotalCells;
 
-    public List<Transform> positionsTest = new List<Transform>();
-    private List<ISpatialHash3D> objList = new List<ISpatialHash3D>();
+    public List<SpatialHashObject> HashObjectList = new List<SpatialHashObject>();
 
-    HashGrid3D<ISpatialHash3D> grid;
+    HashGrid3D<SpatialHashObject> grid;
 
     private void Awake()
     {
@@ -34,65 +32,45 @@ public class GridMaker : MonoBehaviour
             {
                 for (int z = 0; z < tubeZ; z++)
                 {
-                    gridPoints.Add(new Vector3(x * cellSize.x, y * cellSize.y, z * cellSize.z));
+                    gridPoints.Add(new Vector3(x * cellSize.x, y * cellSize.y, z * cellSize.z) - (GridDimensions / 2) + (cellSize / 2));
                 }
             }
         }
 
         TotalCells = gridPoints.Count;
 
-        grid = new HashGrid3D<ISpatialHash3D>(rowsX, columnsY, tubeZ, GridDimensions.x, GridDimensions.y, GridDimensions.z);
+        grid = new HashGrid3D<SpatialHashObject>(rowsX, columnsY, tubeZ, GridDimensions.x, GridDimensions.y, GridDimensions.z);
 
-        foreach (Transform t in positionsTest)
+        for (int i = 0; i < HashObjectList.Count; i++)
         {
-            ISpatialHash3D temp = t.GetComponent<ISpatialHash3D>();
-            objList.Add(temp);
-            grid.Insert(temp);
+            grid.Insert(HashObjectList[i]);
         }
 
-        for (int i = 0; i < positionsTest.Count; i++)
-        {
-            ISpatialHash3D temp = positionsTest[i].GetComponent<ISpatialHash3D>();
-            temp.Id = i;
-            objList.Add(temp);
-            grid.Insert(temp);
-        }
-
-        foreach (ISpatialHash3D t in objList)
-        {
-            Debug.Log(grid.cells[t.Index].Count);
-        }
+        //Debug.Log(grid.GetNearby(HashObjectList[0]).Count);
     }
 
     void Start()
     {
-        
+        Debug.Log("Object 1 index: " + HashObjectList[0].Index);
     }
 
     void Update()
     {
-        foreach (ISpatialHash3D t in objList)
+        foreach (SpatialHashObject t in HashObjectList)
         {
             grid.UpdateIndex(t);
         }
+
+        Debug.Log("Object 1 has: " + grid.GetNearby(HashObjectList[0]).Count + " Nearby.");
+        Debug.Log("Object 2 index: " + HashObjectList[1].Index);
     }
 
     public void OnDrawGizmos()
     {
         Gizmos.color = Color.green;
-
         for (int i = 0; i < gridPoints.Count; i++)
         {
             Gizmos.DrawWireCube(gridPoints[i], cellSize);
         }
-    }
-
-    // Better implementation of Floor, which boosts the floor performance greatly
-    private const int _BIG_ENOUGH_INT = 16 * 1024;
-    private const double _BIG_ENOUGH_FLOOR = _BIG_ENOUGH_INT + 0.0000;
-
-    private static int FastFloor(float f)
-    {
-        return (int)(f + _BIG_ENOUGH_FLOOR) - _BIG_ENOUGH_INT;
     }
 }
