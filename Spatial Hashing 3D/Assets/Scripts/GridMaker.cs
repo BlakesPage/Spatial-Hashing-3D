@@ -12,13 +12,11 @@ public class GridMaker : MonoBehaviour
     public int rowsX;
     public int columnsY;
     public int tubeZ;
-
     
     public int TotalCells;
 
     public List<SpatialHashObject> HashObjectList = new List<SpatialHashObject>();
 
-    private List<Vector3> gridPoints = new List<Vector3>();
     HashGrid3D<SpatialHashObject> grid;
 
     private void Awake()
@@ -52,7 +50,8 @@ public class GridMaker : MonoBehaviour
         {
             foreach (Vector3 v in grid.cellPositions)
             {
-                Gizmos.DrawWireCube(new Vector3(v.x * grid.CellSize.x, v.y * grid.CellSize.y, v.z * grid.CellSize.z), grid.CellSize);
+                Gizmos.DrawWireCube(new Vector3(v.x * grid.CellSize.x, v.y * grid.CellSize.y, v.z * grid.CellSize.z) + 
+                                    new Vector3(grid.CellSize.x / 2, grid.CellSize.y / 2, grid.CellSize.z / 2), grid.CellSize);
             }
         }
     }

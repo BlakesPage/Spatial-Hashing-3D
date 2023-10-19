@@ -33,10 +33,6 @@ namespace BlakesHashGrid
             CellSize.y = GridDimensions.y / columnsY;
             CellSize.z = GridDimensions.z / tubeZ;
 
-            //CellSize.x /= 2;
-            //CellSize.y /= 2;
-            //CellSize /= 2;
-
             cells = new Dictionary<uint, List<T>>(rowsX * columnsY * tubeZ);
 
             for (uint i = 0; i < rowsX * columnsY * tubeZ; i++)
@@ -188,7 +184,6 @@ namespace BlakesHashGrid
             if(!cellPositions.Contains(pos))
             {
                 cellPositions.Add(pos);
-                Debug.Log("New pos = " + pos + " original pos = " + point);
             }
 
             return pos;
