@@ -14,36 +14,20 @@ namespace BlakesHashGrid
         public int tubeZ;
 
         public Dictionary<uint, List<T>> cells;
-        public int CellCount;
+        public uint CellCountMax;
+        public uint CurrentCellCount;
 
         private static Vector3[] offsets;
 
         public List<Vector3> cellPositions = new List<Vector3>();
 
-        public HashGrid3D(int rows, int cols, int tubes, Vector3 dimensions)
+        public HashGrid3D(Vector3 cellSize)
         {
-            GridDimensions.x = dimensions.x;
-            GridDimensions.y = dimensions.y;
-            GridDimensions.z = dimensions.z;
-            rowsX = rows;
-            columnsY = cols;
-            tubeZ = tubes;
+            CellSize = cellSize;
 
-            CellSize.x = GridDimensions.x / rowsX;
-            CellSize.y = GridDimensions.y / columnsY;
-            CellSize.z = GridDimensions.z / tubeZ;
+            cells = new Dictionary<uint, List<T>>();
 
-            cells = new Dictionary<uint, List<T>>(rowsX * columnsY * tubeZ);
-
-            // could just add a new entry to to dictionary when a new cell is find rather than defining it
-            // and have a constant cell size that is added and created
-
-            for (uint i = 0; i < rowsX * columnsY * tubeZ; i++)
-            {
-                cells.Add(i, new List<T>());
-            }
-
-            CellCount = cells.Count;
+            CellCountMax = uint.MaxValue / 64;
 
             offsets = new Vector3[26];
 
@@ -86,7 +70,17 @@ namespace BlakesHashGrid
         /// <param name="obj"></param>
         public void Insert(T obj)
         {
-            uint index = obj.Index = GetIndex(obj.GetPosition());
+            Vector3Int cellPos;
+            uint index = obj.Index = GetIndex(obj.GetPosition(), out cellPos);
+
+            if(!cells.ContainsKey(index))
+            {
+                CurrentCellCount++;
+
+                cells.Add(index, new List<T>());
+
+                cellPositions.Add(cellPos); // for drawing cells
+            }
 
             cells[index].Add(obj);
         }
@@ -122,15 +116,22 @@ namespace BlakesHashGrid
             //get all objects in surrounding cells
             foreach (Vector3 v in offsets)
             {
-                uint tempIndex = GetIndex(position + v);
+                Vector3Int pos;
+
+                uint tempIndex = GetIndex(position + v, out pos);
 
                 if (index == tempIndex) { continue; }
 
-                foreach(T Object in cells[tempIndex])
+                List<T> cellList;
+
+                if(cells.TryGetValue(tempIndex, out cellList))
                 {
-                    if(Object.Enabled == true)
+                    foreach (T Object in cellList)
                     {
-                        tempList.Add(Object);
+                        if (Object.Enabled == true)
+                        {
+                            tempList.Add(Object);
+                        }
                     }
                 }
             }
@@ -163,33 +164,41 @@ namespace BlakesHashGrid
             if(obj.Enabled == false) return;
 
             uint index = obj.Index;
-                
-            uint newIndex = GetIndex(obj.GetPosition());
+
+            Vector3Int cellPos;
+
+            uint newIndex = GetIndex(obj.GetPosition(), out cellPos);
 
             if(index != newIndex)
-            { 
-                cells[index].Remove(obj);
+            {
+                bool Item = cells.TryGetValue(newIndex, out var cell);
+
+                if(Item == false) // if cell doesnt exist create it
+                {
+                    CurrentCellCount++;
+                    cells.Add(newIndex, new List<T>());
+
+                    cellPositions.Add(cellPos); // for drawing cells
+
+                    //Debug.Log("Current Cell Count: " + CurrentCellCount);
+                }
+
                 cells[newIndex].Add(obj);
+                cells[index].Remove(obj);
                 obj.Index = newIndex;
-                Debug.Log(obj.Index);
+
+                //Debug.Log(obj.Index);
             }
         }
 
-        private Vector3Int PositionToCellCoord(Vector3 point, Vector3 cellSize)
+        private Vector3Int PositionToCellCoord(Vector3 point, Vector3 cellSize, out Vector3Int pos)
         {
             // set a min and max Vec3 and detect if outside of bounds
             int cellX = FastFloor(point.x / cellSize.x);
             int cellY = FastFloor(point.y / cellSize.y);
             int cellZ = FastFloor(point.z / cellSize.z);
 
-            Vector3Int pos = new Vector3Int(cellX, cellY, cellZ);
-
-            if(!cellPositions.Contains(pos))
-            {
-                cellPositions.Add(pos);
-            }
-
-            return pos;
+            return pos = new Vector3Int(cellX, cellY, cellZ);
         }
 
         private uint HashCell(Vector3Int cellCoord)
@@ -200,12 +209,13 @@ namespace BlakesHashGrid
 
         private uint GetIndexFromHash(uint num)
         {
-            return (uint)(num % CellCount);
+            return num % CellCountMax; // this can be slow FIND WAY TO BOOST PERFORMANCE
         }
 
-        private uint GetIndex(Vector3 point)
+        private uint GetIndex(Vector3 point, out Vector3Int cellPosition)
         {
-            return GetIndexFromHash(HashCell(PositionToCellCoord(point, CellSize)));
+            uint temp = GetIndexFromHash(HashCell(PositionToCellCoord(point, CellSize, out cellPosition)));
+            return temp;
         }
 
         // Better implementation of Floor, which boosts the floor performance greatly

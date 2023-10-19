@@ -151,7 +151,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 38213764}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 10.76, y: -1.5, z: 1.01}
+  m_LocalPosition: {x: 16.16, y: -1.5, z: 1.01}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -262,12 +262,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25e205746356d7b4aa2a4018780acbde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GridDimensions: {x: 500, y: 50, z: 500}
-  cellSize: {x: 0, y: 0, z: 0}
-  rowsX: 100
-  columnsY: 5
-  tubeZ: 100
+  cellSize: {x: 4, y: 4, z: 4}
   TotalCells: 0
+  ShowGizmos: 1
   HashObjectList:
   - {fileID: 871920006}
   - {fileID: 38213769}
@@ -710,7 +707,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1037548273}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.07, y: -1.5, z: 9.8}
+  m_LocalPosition: {x: 3.07, y: -1.5, z: 15.87}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
