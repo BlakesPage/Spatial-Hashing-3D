@@ -14,19 +14,20 @@ public class GridMaker : MonoBehaviour
     public int tubeZ;
     
     public int TotalCells;
-
     public List<SpatialHashObject> HashObjectList = new List<SpatialHashObject>();
 
     HashGrid3D<SpatialHashObject> grid;
 
     private void Awake()
     {
-        grid = new HashGrid3D<SpatialHashObject>(rowsX, columnsY, tubeZ, GridDimensions.x, GridDimensions.y, GridDimensions.z);
+        grid = new HashGrid3D<SpatialHashObject>(rowsX, columnsY, tubeZ, GridDimensions);
 
         for (int i = 0; i < HashObjectList.Count; i++)
         {
             grid.Insert(HashObjectList[i]);
         }
+
+        TotalCells = grid.cells.Count;
     }
 
     void Start()
@@ -54,5 +55,9 @@ public class GridMaker : MonoBehaviour
                                     new Vector3(grid.CellSize.x / 2, grid.CellSize.y / 2, grid.CellSize.z / 2), grid.CellSize);
             }
         }
+
+        Gizmos.color = Color.red;
+
+        Gizmos.DrawWireCube(Vector3.zero, GridDimensions);
     }
 }

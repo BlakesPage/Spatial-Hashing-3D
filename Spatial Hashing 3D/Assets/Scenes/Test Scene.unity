@@ -262,11 +262,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25e205746356d7b4aa2a4018780acbde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GridDimensions: {x: 50, y: 50, z: 50}
+  GridDimensions: {x: 500, y: 50, z: 500}
   cellSize: {x: 0, y: 0, z: 0}
-  rowsX: 10
-  columnsY: 10
-  tubeZ: 10
+  rowsX: 100
+  columnsY: 5
+  tubeZ: 100
   TotalCells: 0
   HashObjectList:
   - {fileID: 871920006}

@@ -20,11 +20,11 @@ namespace BlakesHashGrid
 
         public List<Vector3> cellPositions = new List<Vector3>();
 
-        public HashGrid3D(int cols, int rows, int tubes, float dimensionsX, float dimensionsY, float dimensionsZ)
+        public HashGrid3D(int rows, int cols, int tubes, Vector3 dimensions)
         {
-            GridDimensions.x = dimensionsX;
-            GridDimensions.y = dimensionsY;
-            GridDimensions.z = dimensionsZ;
+            GridDimensions.x = dimensions.x;
+            GridDimensions.y = dimensions.y;
+            GridDimensions.z = dimensions.z;
             rowsX = rows;
             columnsY = cols;
             tubeZ = tubes;
@@ -34,6 +34,9 @@ namespace BlakesHashGrid
             CellSize.z = GridDimensions.z / tubeZ;
 
             cells = new Dictionary<uint, List<T>>(rowsX * columnsY * tubeZ);
+
+            // could just add a new entry to to dictionary when a new cell is find rather than defining it
+            // and have a constant cell size that is added and created
 
             for (uint i = 0; i < rowsX * columnsY * tubeZ; i++)
             {
@@ -142,7 +145,6 @@ namespace BlakesHashGrid
             if (obj.Enabled == false) return tempList;
 
             // Cache object values for performance
-            //Vector3 position = obj.GetPosition();
             uint index = obj.Index;
 
             // Get all objects in current cell & remove this obj
@@ -169,6 +171,7 @@ namespace BlakesHashGrid
                 cells[index].Remove(obj);
                 cells[newIndex].Add(obj);
                 obj.Index = newIndex;
+                Debug.Log(obj.Index);
             }
         }
 
