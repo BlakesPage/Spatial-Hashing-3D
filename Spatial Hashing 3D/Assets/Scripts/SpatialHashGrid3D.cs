@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
-using BlakesHashGrid;
+using BlakesSpatialHash;
 
-public class GridMaker : MonoBehaviour
+public class SpatialHashGrid3D : MonoBehaviour
 {
     [Header("Cell Size")]
     public Vector3 cellSize;

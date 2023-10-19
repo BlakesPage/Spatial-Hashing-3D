@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace BlakesHashGrid
+namespace BlakesSpatialHash
 {
     public interface ISpatialHash3D
     {

@@ -1,19 +1,14 @@
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
-namespace BlakesHashGrid
+namespace BlakesSpatialHash
 {
     public class HashGrid3D<T> where T : SpatialHashObject
     {
-        public Vector3 GridDimensions;
+        public Dictionary<uint, List<T>> cells;
+
         public Vector3 CellSize;
 
-        public int rowsX;
-        public int columnsY;
-        public int tubeZ;
-
-        public Dictionary<uint, List<T>> cells;
         public uint CellCountMax;
         public uint CurrentCellCount;
 
@@ -70,8 +65,7 @@ namespace BlakesHashGrid
         /// <param name="obj"></param>
         public void Insert(T obj)
         {
-            Vector3Int cellPos;
-            uint index = obj.Index = GetIndex(obj.GetPosition(), out cellPos);
+            uint index = obj.Index = GetIndex(obj.GetPosition(), out Vector3Int cellPos);
 
             if(!cells.ContainsKey(index))
             {
@@ -165,9 +159,7 @@ namespace BlakesHashGrid
 
             uint index = obj.Index;
 
-            Vector3Int cellPos;
-
-            uint newIndex = GetIndex(obj.GetPosition(), out cellPos);
+            uint newIndex = GetIndex(obj.GetPosition(), out Vector3Int cellPos);
 
             if(index != newIndex)
             {
