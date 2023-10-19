@@ -13,45 +13,27 @@ public class GridMaker : MonoBehaviour
     public int columnsY;
     public int tubeZ;
 
-    private List<Vector3> gridPoints = new List<Vector3>();
+    
     public int TotalCells;
 
     public List<SpatialHashObject> HashObjectList = new List<SpatialHashObject>();
 
+    private List<Vector3> gridPoints = new List<Vector3>();
     HashGrid3D<SpatialHashObject> grid;
 
     private void Awake()
     {
-        cellSize.x = GridDimensions.x / rowsX;
-        cellSize.y = GridDimensions.y / columnsY;
-        cellSize.z = GridDimensions.z / tubeZ;
-
-        for (int x = 0; x < rowsX; x++)
-        {
-            for (int y = 0; y < columnsY; y++)
-            {
-                for (int z = 0; z < tubeZ; z++)
-                {
-                    gridPoints.Add(new Vector3(x * cellSize.x, y * cellSize.y, z * cellSize.z) - (GridDimensions / 2) + (cellSize / 2));
-                }
-            }
-        }
-
-        TotalCells = gridPoints.Count;
-
         grid = new HashGrid3D<SpatialHashObject>(rowsX, columnsY, tubeZ, GridDimensions.x, GridDimensions.y, GridDimensions.z);
 
         for (int i = 0; i < HashObjectList.Count; i++)
         {
             grid.Insert(HashObjectList[i]);
         }
-
-        //Debug.Log(grid.GetNearby(HashObjectList[0]).Count);
     }
 
     void Start()
     {
-        Debug.Log("Object 1 index: " + HashObjectList[0].Index);
+        
     }
 
     void Update()
@@ -60,17 +42,18 @@ public class GridMaker : MonoBehaviour
         {
             grid.UpdateIndex(t);
         }
-
-        Debug.Log("Object 1 has: " + grid.GetNearby(HashObjectList[0]).Count + " Nearby.");
-        Debug.Log("Object 2 index: " + HashObjectList[1].Index);
     }
 
     public void OnDrawGizmos()
     {
         Gizmos.color = Color.green;
-        for (int i = 0; i < gridPoints.Count; i++)
+
+        if(grid != null)
         {
-            Gizmos.DrawWireCube(gridPoints[i], cellSize);
+            foreach (Vector3 v in grid.cellPositions)
+            {
+                Gizmos.DrawWireCube(new Vector3(v.x * grid.CellSize.x, v.y * grid.CellSize.y, v.z * grid.CellSize.z), grid.CellSize);
+            }
         }
     }
 }

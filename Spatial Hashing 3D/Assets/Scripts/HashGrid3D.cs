@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace BlakesHashGrid
@@ -17,6 +18,8 @@ namespace BlakesHashGrid
 
         private static Vector3[] offsets;
 
+        public List<Vector3> cellPositions = new List<Vector3>();
+
         public HashGrid3D(int cols, int rows, int tubes, float dimensionsX, float dimensionsY, float dimensionsZ)
         {
             GridDimensions.x = dimensionsX;
@@ -29,7 +32,10 @@ namespace BlakesHashGrid
             CellSize.x = GridDimensions.x / rowsX;
             CellSize.y = GridDimensions.y / columnsY;
             CellSize.z = GridDimensions.z / tubeZ;
-            CellSize /= 2;
+
+            //CellSize.x /= 2;
+            //CellSize.y /= 2;
+            //CellSize /= 2;
 
             cells = new Dictionary<uint, List<T>>(rowsX * columnsY * tubeZ);
 
@@ -81,9 +87,18 @@ namespace BlakesHashGrid
         /// <param name="obj"></param>
         public void Insert(T obj)
         {
-            uint index = obj.Index = GetIndexFromHash(HashCell(PositionToCellCoord(obj.GetPosition(), CellSize)));
+            uint index = obj.Index = GetIndex(obj.GetPosition());
 
             cells[index].Add(obj);
+        }
+
+        /// <summary>
+        /// Removes OBJECT from current Cell
+        /// </summary>
+        /// <param name="obj"></param>
+        public void Remove(T obj)
+        {
+            cells[obj.Index].Remove(obj);
         }
 
         /// <summary>
@@ -91,9 +106,11 @@ namespace BlakesHashGrid
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public List<T> GetNearby(T obj)
+        public List<T> GetNearbySurroundingCells(T obj)
         {
             List<T> tempList = new List<T>();
+
+            if(obj.Enabled == false) return tempList;
 
             // Cache object values for performance
             Vector3 position = obj.GetPosition();
@@ -106,12 +123,35 @@ namespace BlakesHashGrid
             //get all objects in surrounding cells
             foreach (Vector3 v in offsets)
             {
-                uint tempIndex = GetIndexFromHash(HashCell(PositionToCellCoord(position + v, CellSize)));
+                uint tempIndex = GetIndex(position + v);
 
                 if (index == tempIndex) { continue; }
 
-                tempList.AddRange(cells[tempIndex]);
+                foreach(T Object in cells[tempIndex])
+                {
+                    if(Object.Enabled == true)
+                    {
+                        tempList.Add(Object);
+                    }
+                }
             }
+
+            return tempList;
+        }
+
+        public List<T> GetNearbyCurrentCell(T obj)
+        {
+            List<T> tempList = new List<T>();
+
+            if (obj.Enabled == false) return tempList;
+
+            // Cache object values for performance
+            //Vector3 position = obj.GetPosition();
+            uint index = obj.Index;
+
+            // Get all objects in current cell & remove this obj
+            tempList.AddRange(cells[index]);
+            tempList.Remove(obj);
 
             return tempList;
         }
@@ -122,6 +162,8 @@ namespace BlakesHashGrid
         /// <param name="obj"></param>
         public void UpdateIndex(T obj)
         {
+            if(obj.Enabled == false) return;
+
             uint index = obj.Index;
                 
             uint newIndex = GetIndex(obj.GetPosition());
@@ -137,13 +179,19 @@ namespace BlakesHashGrid
         private Vector3Int PositionToCellCoord(Vector3 point, Vector3 cellSize)
         {
             // set a min and max Vec3 and detect if outside of bounds
-            //int cellX = FastFloor(point.x / (cellSize.x / 2));
-            //int cellY = FastFloor(point.y / (cellSize.y / 2));
-            //int cellZ = FastFloor(point.z / (cellSize.z / 2));
             int cellX = FastFloor(point.x / cellSize.x);
             int cellY = FastFloor(point.y / cellSize.y);
             int cellZ = FastFloor(point.z / cellSize.z);
-            return new Vector3Int(cellX, cellY, cellZ);
+
+            Vector3Int pos = new Vector3Int(cellX, cellY, cellZ);
+
+            if(!cellPositions.Contains(pos))
+            {
+                cellPositions.Add(pos);
+                Debug.Log("New pos = " + pos + " original pos = " + point);
+            }
+
+            return pos;
         }
 
         private uint HashCell(Vector3Int cellCoord)
