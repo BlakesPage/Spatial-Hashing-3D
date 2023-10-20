@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 namespace BlakesSpatialHash
@@ -7,12 +8,12 @@ namespace BlakesSpatialHash
     {
         public Dictionary<uint, List<T>> cells;
 
-        public Vector3 CellSize;
+        private Vector3 CellSize;
 
         public uint CellCountMax;
         public uint CurrentCellCount;
 
-        private static Vector3[] offsets;
+        private Vector3[] offsets;
 
         public List<Vector3> cellPositions = new List<Vector3>();
 
@@ -20,43 +21,58 @@ namespace BlakesSpatialHash
         {
             CellSize = cellSize;
 
-            cells = new Dictionary<uint, List<T>>();
+            CellCountMax = 100000;
 
-            CellCountMax = uint.MaxValue / 64;
+            cells = new Dictionary<uint, List<T>>((int)CellCountMax);
 
-            offsets = new Vector3[26];
+            for (uint i = 0; i < CellCountMax; i++)
+            {
+                cells[i] = new List<T>();
+            }
 
+            //offsets = new Vector3[26];
             // bottom 9 of the 3x3x3
-            offsets[0] = new Vector3(-CellSize.x, -CellSize.y, -CellSize.z);    // 1x1x1
-            offsets[1] = new Vector3(-CellSize.x, -CellSize.y, 0);              // 1x1x2
-            offsets[2] = new Vector3(-CellSize.x, -CellSize.y, CellSize.z);     // 1x1x3
-            offsets[3] = new Vector3(0, -CellSize.y, -CellSize.z);              // 2x1x1
-            offsets[4] = new Vector3(0, -CellSize.y, 0);                        // 2x1x2
-            offsets[5] = new Vector3(0, -CellSize.y, CellSize.z);               // 2x1x3
-            offsets[6] = new Vector3(CellSize.x, -CellSize.y, -CellSize.z);     // 3x1x1
-            offsets[7] = new Vector3(CellSize.x, -CellSize.y, 0);               // 3x1x2
-            offsets[8] = new Vector3(CellSize.x, -CellSize.y, CellSize.z);      // 3x1x3
+            //offsets[0] = new Vector3(-CellSize.x, -CellSize.y, -CellSize.z);    // 1x1x1
+            //offsets[1] = new Vector3(-CellSize.x, -CellSize.y, 0);              // 1x1x2
+            //offsets[2] = new Vector3(-CellSize.x, -CellSize.y, CellSize.z);     // 1x1x3
+            //offsets[3] = new Vector3(0, -CellSize.y, -CellSize.z);              // 2x1x1
+            //offsets[4] = new Vector3(0, -CellSize.y, 0);                        // 2x1x2
+            //offsets[5] = new Vector3(0, -CellSize.y, CellSize.z);               // 2x1x3
+            //offsets[6] = new Vector3(CellSize.x, -CellSize.y, -CellSize.z);     // 3x1x1
+            //[7] = new Vector3(CellSize.x, -CellSize.y, 0);               // 3x1x2
+            //offsets[8] = new Vector3(CellSize.x, -CellSize.y, CellSize.z);      // 3x1x3
 
             // middle  8 of the 3x3x3, excluding 2x2x2
-            offsets[9] = new Vector3(-CellSize.x, 0, -CellSize.z);              // 1x2x1
-            offsets[10] = new Vector3(-CellSize.x, 0, 0);                       // 1x2x2
-            offsets[11] = new Vector3(-CellSize.x, 0, CellSize.z);              // 1x2x3
-            offsets[12] = new Vector3(0, 0, -CellSize.z);                       // 2x2x1
-            offsets[13] = new Vector3(0, 0, CellSize.z);                        // 2x2x3
-            offsets[14] = new Vector3(CellSize.x, 0, -CellSize.z);              // 3x2x1
-            offsets[15] = new Vector3(CellSize.x, 0, 0);                        // 3x2x2
-            offsets[16] = new Vector3(CellSize.x, 0, CellSize.z);               // 3x2x3
+            //offsets[9] = new Vector3(-CellSize.x, 0, -CellSize.z);              // 1x2x1
+            //offsets[10] = new Vector3(-CellSize.x, 0, 0);                       // 1x2x2
+            //offsets[11] = new Vector3(-CellSize.x, 0, CellSize.z);              // 1x2x3
+            //offsets[12] = new Vector3(0, 0, -CellSize.z);                       // 2x2x1
+            //offsets[13] = new Vector3(0, 0, CellSize.z);                        // 2x2x3
+            //offsets[14] = new Vector3(CellSize.x, 0, -CellSize.z);              // 3x2x1
+            //offsets[15] = new Vector3(CellSize.x, 0, 0);                        // 3x2x2
+            //offsets[16] = new Vector3(CellSize.x, 0, CellSize.z);               // 3x2x3
 
             // top 9 of the 3x3x3
-            offsets[17] = new Vector3(-CellSize.x, CellSize.y, -CellSize.z);    // 1x3x1
-            offsets[18] = new Vector3(-CellSize.x, CellSize.y, 0);              // 1x3x2
-            offsets[19] = new Vector3(-CellSize.x, CellSize.y, CellSize.z);     // 1x3x3
-            offsets[20] = new Vector3(0, CellSize.y, -CellSize.z);              // 2x3x1
-            offsets[21] = new Vector3(0, CellSize.y, 0);                        // 2x3x2
-            offsets[22] = new Vector3(0, CellSize.y, CellSize.z);               // 2x3x3
-            offsets[23] = new Vector3(CellSize.x, CellSize.y, -CellSize.z);     // 3x3x1
-            offsets[24] = new Vector3(CellSize.x, CellSize.y, 0);               // 3x3x2
-            offsets[25] = new Vector3(CellSize.x, CellSize.y, CellSize.z);      // 3x3x3
+            //offsets[17] = new Vector3(-CellSize.x, CellSize.y, -CellSize.z);    // 1x3x1
+            //offsets[18] = new Vector3(-CellSize.x, CellSize.y, 0);              // 1x3x2
+            //offsets[19] = new Vector3(-CellSize.x, CellSize.y, CellSize.z);     // 1x3x3
+            //offsets[20] = new Vector3(0, CellSize.y, -CellSize.z);              // 2x3x1
+            //offsets[21] = new Vector3(0, CellSize.y, 0);                        // 2x3x2
+            //offsets[22] = new Vector3(0, CellSize.y, CellSize.z);               // 2x3x3
+            //offsets[23] = new Vector3(CellSize.x, CellSize.y, -CellSize.z);     // 3x3x1
+            //offsets[24] = new Vector3(CellSize.x, CellSize.y, 0);               // 3x3x2
+            //offsets[25] = new Vector3(CellSize.x, CellSize.y, CellSize.z);      // 3x3x3
+
+            offsets = new Vector3[8];
+            // middle  8 of the 3x3x3, excluding 2x2x2
+            offsets[0] = new Vector3(-CellSize.x, 0, -CellSize.z);              // 1x2x1
+            offsets[1] = new Vector3(-CellSize.x, 0, 0);                       // 1x2x2
+            offsets[2] = new Vector3(-CellSize.x, 0, CellSize.z);              // 1x2x3
+            offsets[3] = new Vector3(0, 0, -CellSize.z);                       // 2x2x1
+            offsets[4] = new Vector3(0, 0, CellSize.z);                        // 2x2x3
+            offsets[5] = new Vector3(CellSize.x, 0, -CellSize.z);              // 3x2x1
+            offsets[6] = new Vector3(CellSize.x, 0, 0);                        // 3x2x2
+            offsets[7] = new Vector3(CellSize.x, 0, CellSize.z);               // 3x2x3
         }
 
         /// <summary>
@@ -65,18 +81,19 @@ namespace BlakesSpatialHash
         /// <param name="obj"></param>
         public void Insert(T obj)
         {
-            uint index = obj.Index = GetIndex(obj.GetPosition(), out Vector3Int cellPos);
+            uint index = obj.Index = GetIndex(obj.GetPosition, out Vector3Int cellPos);
 
-            if(!cells.ContainsKey(index))
-            {
-                CurrentCellCount++;
+            //if (!cells.ContainsKey(index)) // PERFORMANCE CAN BE GAINED BY GETTING REF TO DICTIONARY VALUE (dont think unity allows unsafe methods)
+            //{
+            //    CurrentCellCount++;
 
-                cells.Add(index, new List<T>());
+            //    cells.Add(index, new List<T>());
 
-                cellPositions.Add(cellPos); // for drawing cells
-            }
-
+            //    cellPositions.Add(cellPos); // for drawing cells
+            //}
             cells[index].Add(obj);
+
+            cellPositions.Add(cellPos); // for drawing cells
         }
 
         /// <summary>
@@ -93,14 +110,14 @@ namespace BlakesSpatialHash
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public List<T> GetNearbySurroundingCells(T obj)
+        public List<T> GetNearbySurroundingObjects(T obj)
         {
             List<T> tempList = new List<T>();
 
             if(obj.Enabled == false) return tempList;
 
             // Cache object values for performance
-            Vector3 position = obj.GetPosition();
+            Vector3 position = obj.GetPosition;
             uint index = obj.Index;
 
             // Get all objects in current cell & remove this obj
@@ -108,20 +125,22 @@ namespace BlakesSpatialHash
             tempList.Remove(obj);
 
             //get all objects in surrounding cells
-            foreach (Vector3 v in offsets)
+            for (int i = 0; i < 8; i++)
             {
-                Vector3Int pos;
-
-                uint tempIndex = GetIndex(position + v, out pos);
+                uint tempIndex = GetIndex(position + offsets[i], out Vector3Int pos);
 
                 if (index == tempIndex) { continue; }
 
-                List<T> cellList;
-
-                if(cells.TryGetValue(tempIndex, out cellList))
+                if (cells.TryGetValue(tempIndex, out List<T> cellList))
                 {
-                    foreach (T Object in cellList)
+                    int count = cellList.Count;
+
+                    if (count == 0) continue;
+
+                    for (int j = 0; j < count; j++)
                     {
+                        T Object = cellList[j];
+
                         if (Object.Enabled == true)
                         {
                             tempList.Add(Object);
@@ -129,22 +148,6 @@ namespace BlakesSpatialHash
                     }
                 }
             }
-
-            return tempList;
-        }
-
-        public List<T> GetNearbyCurrentCell(T obj)
-        {
-            List<T> tempList = new List<T>();
-
-            if (obj.Enabled == false) return tempList;
-
-            // Cache object values for performance
-            uint index = obj.Index;
-
-            // Get all objects in current cell & remove this obj
-            tempList.AddRange(cells[index]);
-            tempList.Remove(obj);
 
             return tempList;
         }
@@ -157,35 +160,46 @@ namespace BlakesSpatialHash
         {
             if(obj.Enabled == false) return;
 
+            Vector3 position = obj.GetPosition;
+
+            if (position == obj.GetLastPosition) return;
+
             uint index = obj.Index;
 
-            uint newIndex = GetIndex(obj.GetPosition(), out Vector3Int cellPos);
+            uint newIndex = GetIndex(position, out Vector3Int cellPos);
 
             if(index != newIndex)
             {
-                bool Item = cells.TryGetValue(newIndex, out var cell);
+                //bool Item = cells.TryGetValue(newIndex, out var cell);
 
-                if(Item == false) // if cell doesnt exist create it
-                {
-                    CurrentCellCount++;
-                    cells.Add(newIndex, new List<T>());
+                //if(Item == false) // if cell doesnt exist create it
+                //{
+                //    CurrentCellCount++;
+                //    cells.Add(newIndex, new List<T>());
 
-                    cellPositions.Add(cellPos); // for drawing cells
+                //    cellPositions.Add(cellPos); // for drawing cells
 
-                    //Debug.Log("Current Cell Count: " + CurrentCellCount);
-                }
+                //    //Debug.Log("Current Cell Count: " + CurrentCellCount);
+                //}
 
-                cells[newIndex].Add(obj);
                 cells[index].Remove(obj);
+                cells[newIndex].Add(obj);
+                
                 obj.Index = newIndex;
+                obj.GetLastPosition = position;
 
-                //Debug.Log(obj.Index);
+                cellPositions.Add(cellPos); // for drawing cells
             }
+        }
+
+        public List<T> UpdateObjectAndGetSurroudingObjects(T obj)
+        {
+            UpdateIndex(obj);
+            return GetNearbySurroundingObjects(obj);
         }
 
         private Vector3Int PositionToCellCoord(Vector3 point, Vector3 cellSize, out Vector3Int pos)
         {
-            // set a min and max Vec3 and detect if outside of bounds
             int cellX = FastFloor(point.x / cellSize.x);
             int cellY = FastFloor(point.y / cellSize.y);
             int cellZ = FastFloor(point.z / cellSize.z);
@@ -201,7 +215,7 @@ namespace BlakesSpatialHash
 
         private uint GetIndexFromHash(uint num)
         {
-            return num % CellCountMax; // this can be slow FIND WAY TO BOOST PERFORMANCE
+            return num % CellCountMax; // this can be slow for larger numbers
         }
 
         private uint GetIndex(Vector3 point, out Vector3Int cellPosition)

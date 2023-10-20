@@ -22,10 +22,14 @@ public class SpatialHashGrid3D : MonoBehaviour
     {
         grid = new HashGrid3D<SpatialHashObject>(cellSize);
 
-        for (int i = 0; i < HashObjectList.Count; i++)
+        int count = HashObjectList.Count;
+
+        for (int i = 0; i < count; i++)
         {
             grid.Insert(HashObjectList[i]);
         }
+
+        TotalCells = (int)grid.CellCountMax;
     }
 
     void Start()
@@ -35,12 +39,12 @@ public class SpatialHashGrid3D : MonoBehaviour
 
     void Update()
     {
-        foreach (SpatialHashObject t in HashObjectList)
-        {
-            grid.UpdateIndex(t);
-        }
+        int count = HashObjectList.Count;
 
-        TotalCells = (int)grid.CurrentCellCount;
+        for (int i = 0; i < count; i++)
+        {
+            grid.UpdateObjectAndGetSurroudingObjects(HashObjectList[i]);
+        }
     }
 
     public void OnDrawGizmos()
@@ -50,10 +54,14 @@ public class SpatialHashGrid3D : MonoBehaviour
             Gizmos.color = Color.magenta;
             if (grid != null)
             {
-                foreach (Vector3 v in grid.cellPositions)
+                int count = grid.cellPositions.Count;
+
+                for (int i = 0; i < count; i++)
                 {
-                    Gizmos.DrawWireCube(new Vector3(v.x * grid.CellSize.x, v.y * grid.CellSize.y, v.z * grid.CellSize.z) +
-                                        new Vector3(grid.CellSize.x / 2, grid.CellSize.y / 2, grid.CellSize.z / 2), grid.CellSize);
+                    Vector3 v = grid.cellPositions[i];
+
+                    Gizmos.DrawWireCube(new Vector3(v.x * cellSize.x, v.y * cellSize.y, v.z * cellSize.z) +
+                                       new Vector3(cellSize.x / 2, cellSize.y / 2, cellSize.z / 2), cellSize);
                 }
             }
         }
