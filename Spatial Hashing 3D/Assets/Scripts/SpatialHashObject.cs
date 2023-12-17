@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace BlakesSpatialHash
@@ -16,5 +17,16 @@ namespace BlakesSpatialHash
         public Vector3 GetLastPosition { get; set; }
         public uint Index { get; set; }
         public bool Enabled { get { return gameObject.activeSelf; } }
+        public List<SpatialHashObject> Objects { get; set; } = new List<SpatialHashObject>();
+
+        public bool DistanceCheck(Vector3 otherObj, float inRange)
+        {
+            if(Vector3.Distance(transform.position, otherObj) < inRange)
+            {
+                return true;
+            }
+            
+            return false;
+        }
     }
 }

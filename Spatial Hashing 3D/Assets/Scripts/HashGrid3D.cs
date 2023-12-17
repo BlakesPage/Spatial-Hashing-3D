@@ -30,49 +30,38 @@ namespace BlakesSpatialHash
                 cells[i] = new List<T>();
             }
 
-            //offsets = new Vector3[26];
+            offsets = new Vector3[26];
             // bottom 9 of the 3x3x3
-            //offsets[0] = new Vector3(-CellSize.x, -CellSize.y, -CellSize.z);    // 1x1x1
-            //offsets[1] = new Vector3(-CellSize.x, -CellSize.y, 0);              // 1x1x2
-            //offsets[2] = new Vector3(-CellSize.x, -CellSize.y, CellSize.z);     // 1x1x3
-            //offsets[3] = new Vector3(0, -CellSize.y, -CellSize.z);              // 2x1x1
-            //offsets[4] = new Vector3(0, -CellSize.y, 0);                        // 2x1x2
-            //offsets[5] = new Vector3(0, -CellSize.y, CellSize.z);               // 2x1x3
-            //offsets[6] = new Vector3(CellSize.x, -CellSize.y, -CellSize.z);     // 3x1x1
-            //[7] = new Vector3(CellSize.x, -CellSize.y, 0);               // 3x1x2
-            //offsets[8] = new Vector3(CellSize.x, -CellSize.y, CellSize.z);      // 3x1x3
+            offsets[0] = new Vector3(-CellSize.x, -CellSize.y, -CellSize.z);    // 1x1x1
+            offsets[1] = new Vector3(-CellSize.x, -CellSize.y, 0);              // 1x1x2
+            offsets[2] = new Vector3(-CellSize.x, -CellSize.y, CellSize.z);     // 1x1x3
+            offsets[3] = new Vector3(0, -CellSize.y, -CellSize.z);              // 2x1x1
+            offsets[4] = new Vector3(0, -CellSize.y, 0);                        // 2x1x2
+            offsets[5] = new Vector3(0, -CellSize.y, CellSize.z);               // 2x1x3
+            offsets[6] = new Vector3(CellSize.x, -CellSize.y, -CellSize.z);     // 3x1x1
+            offsets[7] = new Vector3(CellSize.x, -CellSize.y, 0);               // 3x1x2
+            offsets[8] = new Vector3(CellSize.x, -CellSize.y, CellSize.z);      // 3x1x3
 
             // middle  8 of the 3x3x3, excluding 2x2x2
-            //offsets[9] = new Vector3(-CellSize.x, 0, -CellSize.z);              // 1x2x1
-            //offsets[10] = new Vector3(-CellSize.x, 0, 0);                       // 1x2x2
-            //offsets[11] = new Vector3(-CellSize.x, 0, CellSize.z);              // 1x2x3
-            //offsets[12] = new Vector3(0, 0, -CellSize.z);                       // 2x2x1
-            //offsets[13] = new Vector3(0, 0, CellSize.z);                        // 2x2x3
-            //offsets[14] = new Vector3(CellSize.x, 0, -CellSize.z);              // 3x2x1
-            //offsets[15] = new Vector3(CellSize.x, 0, 0);                        // 3x2x2
-            //offsets[16] = new Vector3(CellSize.x, 0, CellSize.z);               // 3x2x3
+            offsets[9] = new Vector3(-CellSize.x, 0, -CellSize.z);              // 1x2x1
+            offsets[10] = new Vector3(-CellSize.x, 0, 0);                       // 1x2x2
+            offsets[11] = new Vector3(-CellSize.x, 0, CellSize.z);              // 1x2x3
+            offsets[12] = new Vector3(0, 0, -CellSize.z);                       // 2x2x1
+            offsets[13] = new Vector3(0, 0, CellSize.z);                        // 2x2x3
+            offsets[14] = new Vector3(CellSize.x, 0, -CellSize.z);              // 3x2x1
+            offsets[15] = new Vector3(CellSize.x, 0, 0);                        // 3x2x2
+            offsets[16] = new Vector3(CellSize.x, 0, CellSize.z);               // 3x2x3
 
             // top 9 of the 3x3x3
-            //offsets[17] = new Vector3(-CellSize.x, CellSize.y, -CellSize.z);    // 1x3x1
-            //offsets[18] = new Vector3(-CellSize.x, CellSize.y, 0);              // 1x3x2
-            //offsets[19] = new Vector3(-CellSize.x, CellSize.y, CellSize.z);     // 1x3x3
-            //offsets[20] = new Vector3(0, CellSize.y, -CellSize.z);              // 2x3x1
-            //offsets[21] = new Vector3(0, CellSize.y, 0);                        // 2x3x2
-            //offsets[22] = new Vector3(0, CellSize.y, CellSize.z);               // 2x3x3
-            //offsets[23] = new Vector3(CellSize.x, CellSize.y, -CellSize.z);     // 3x3x1
-            //offsets[24] = new Vector3(CellSize.x, CellSize.y, 0);               // 3x3x2
-            //offsets[25] = new Vector3(CellSize.x, CellSize.y, CellSize.z);      // 3x3x3
-
-            offsets = new Vector3[8];
-            // middle  8 of the 3x3x3, excluding 2x2x2
-            offsets[0] = new Vector3(-CellSize.x, 0, -CellSize.z);              // 1x2x1
-            offsets[1] = new Vector3(-CellSize.x, 0, 0);                       // 1x2x2
-            offsets[2] = new Vector3(-CellSize.x, 0, CellSize.z);              // 1x2x3
-            offsets[3] = new Vector3(0, 0, -CellSize.z);                       // 2x2x1
-            offsets[4] = new Vector3(0, 0, CellSize.z);                        // 2x2x3
-            offsets[5] = new Vector3(CellSize.x, 0, -CellSize.z);              // 3x2x1
-            offsets[6] = new Vector3(CellSize.x, 0, 0);                        // 3x2x2
-            offsets[7] = new Vector3(CellSize.x, 0, CellSize.z);               // 3x2x3
+            offsets[17] = new Vector3(-CellSize.x, CellSize.y, -CellSize.z);    // 1x3x1
+            offsets[18] = new Vector3(-CellSize.x, CellSize.y, 0);              // 1x3x2
+            offsets[19] = new Vector3(-CellSize.x, CellSize.y, CellSize.z);     // 1x3x3
+            offsets[20] = new Vector3(0, CellSize.y, -CellSize.z);              // 2x3x1
+            offsets[21] = new Vector3(0, CellSize.y, 0);                        // 2x3x2
+            offsets[22] = new Vector3(0, CellSize.y, CellSize.z);               // 2x3x3
+            offsets[23] = new Vector3(CellSize.x, CellSize.y, -CellSize.z);     // 3x3x1
+            offsets[24] = new Vector3(CellSize.x, CellSize.y, 0);               // 3x3x2
+            offsets[25] = new Vector3(CellSize.x, CellSize.y, CellSize.z);      // 3x3x3
         }
 
         /// <summary>
@@ -83,14 +72,6 @@ namespace BlakesSpatialHash
         {
             uint index = obj.Index = GetIndex(obj.GetPosition, out Vector3Int cellPos);
 
-            //if (!cells.ContainsKey(index)) // PERFORMANCE CAN BE GAINED BY GETTING REF TO DICTIONARY VALUE (dont think unity allows unsafe methods)
-            //{
-            //    CurrentCellCount++;
-
-            //    cells.Add(index, new List<T>());
-
-            //    cellPositions.Add(cellPos); // for drawing cells
-            //}
             cells[index].Add(obj);
 
             cellPositions.Add(cellPos); // for drawing cells
@@ -124,8 +105,10 @@ namespace BlakesSpatialHash
             tempList.AddRange(cells[index]);
             tempList.Remove(obj);
 
+            // add check to see current cell and what direction you are from the center and only check those surrounding boxes and not all
+
             //get all objects in surrounding cells
-            for (int i = 0; i < 8; i++)
+            for (int i = 0; i < 26; i++)
             {
                 uint tempIndex = GetIndex(position + offsets[i], out Vector3Int pos);
 
@@ -170,18 +153,6 @@ namespace BlakesSpatialHash
 
             if(index != newIndex)
             {
-                //bool Item = cells.TryGetValue(newIndex, out var cell);
-
-                //if(Item == false) // if cell doesnt exist create it
-                //{
-                //    CurrentCellCount++;
-                //    cells.Add(newIndex, new List<T>());
-
-                //    cellPositions.Add(cellPos); // for drawing cells
-
-                //    //Debug.Log("Current Cell Count: " + CurrentCellCount);
-                //}
-
                 cells[index].Remove(obj);
                 cells[newIndex].Add(obj);
                 
@@ -215,7 +186,7 @@ namespace BlakesSpatialHash
 
         private uint GetIndexFromHash(uint num)
         {
-            return num % CellCountMax; // this can be slow for larger numbers
+            return num % CellCountMax;
         }
 
         private uint GetIndex(Vector3 point, out Vector3Int cellPosition)
