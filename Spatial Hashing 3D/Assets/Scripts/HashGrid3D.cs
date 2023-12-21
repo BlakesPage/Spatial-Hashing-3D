@@ -191,8 +191,7 @@ namespace BlakesSpatialHash
 
         private uint GetIndex(Vector3 point, out Vector3Int cellPosition)
         {
-            uint temp = GetIndexFromHash(HashCell(PositionToCellCoord(point, CellSize, out cellPosition)));
-            return temp;
+            return GetIndexFromHash(HashCell(PositionToCellCoord(point, CellSize, out cellPosition)));
         }
 
         // Better implementation of Floor, which boosts the floor performance greatly
